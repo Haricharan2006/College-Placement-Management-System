@@ -7,14 +7,14 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
     exit();
 }
 
-$result = mysqli_query($conn, "SELECT jobs.*, companies.company_name 
-FROM jobs JOIN companies ON jobs.company_id = companies.id");
+$result = mysqli_query($conn, "SELECT users.name, users.email, companies.* 
+FROM companies JOIN users ON companies.user_id = users.id");
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>All Jobs</title>
+    <title>All Companies</title>
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -32,23 +32,23 @@ FROM jobs JOIN companies ON jobs.company_id = companies.id");
 
     <div class="content">
         <div class="topbar">
-            <h1>All Jobs</h1>
-            <p>Monitor all company job postings</p>
+            <h1>All Companies</h1>
+            <p>View registered company details</p>
         </div>
 
         <table>
             <tr>
-                <th>Company</th><th>Title</th><th>Package</th><th>CGPA</th><th>Last Date</th><th>Status</th>
+                <th>HR Name</th><th>Email</th><th>Company</th><th>Industry</th><th>Location</th><th>Website</th>
             </tr>
 
             <?php while($row = mysqli_fetch_assoc($result)){ ?>
             <tr>
+                <td><?php echo $row['name']; ?></td>
+                <td><?php echo $row['email']; ?></td>
                 <td><?php echo $row['company_name']; ?></td>
-                <td><?php echo $row['title']; ?></td>
-                <td><?php echo $row['package']; ?></td>
-                <td><?php echo $row['eligibility_cgpa']; ?></td>
-                <td><?php echo $row['last_date']; ?></td>
-                <td><?php echo $row['status']; ?></td>
+                <td><?php echo $row['industry']; ?></td>
+                <td><?php echo $row['location']; ?></td>
+                <td><?php echo $row['website']; ?></td>
             </tr>
             <?php } ?>
         </table>
