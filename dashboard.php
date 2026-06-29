@@ -2,24 +2,26 @@
 session_start();
 include("../config.php");
 
-if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'student'){
+if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'company'){
     header("Location: ../login.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-$result = mysqli_query($conn, "SELECT users.name, users.email, students.* 
-FROM students JOIN users ON students.user_id = users.id 
-WHERE users.id='$user_id'");
+$company = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM companies WHERE user_id='$user_id'"));
+$company_id = $company['id'];
 
-$student = mysqli_fetch_assoc($result);
+$jobs = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM jobs WHERE company_id='$company_id'"))['total'];
+$applications = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications 
+JOIN jobs ON applications.job_id=jobs.id 
+WHERE jobs.company_id='$company_id'"))['total'];
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Dashboard</title>
+    <title>Company Dashboard</title>
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -28,29 +30,22 @@ $student = mysqli_fetch_assoc($result);
     <div class="sidebar">
         <h2>PlacementPro</h2>
         <a href="dashboard.php">Dashboard</a>
-        <a href="profile.php">Profile</a>
-        <a href="jobs.php">Jobs</a>
+        <a href="post_job.php">Post Job</a>
+        <a href="my_jobs.php">My Jobs</a>
         <a href="applications.php">Applications</a>
         <a href="../logout.php">Logout</a>
     </div>
 
     <div class="content">
         <div class="topbar">
-            <h1>Student Dashboard</h1>
-            <p>Welcome, <?php echo $student['name']; ?></p>
+            <h1>Company Dashboard</h1>
+            <p>Welcome, <?php echo $company['company_name']; ?></p>
         </div>
 
-        <table>
-            <tr><th>Name</th><td><?php echo $student['name']; ?></td></tr>
-            <tr><th>Email</th><td><?php echo $student['email']; ?></td></tr>
-            <tr><th>Roll No</th><td><?php echo $student['roll_no']; ?></td></tr>
-            <tr><th>Branch</th><td><?php echo $student['branch']; ?></td></tr>
-            <tr><th>Year</th><td><?php echo $student['year']; ?></td></tr>
-            <tr><th>CGPA</th><td><?php echo $student['cgpa']; ?></td></tr>
-            <tr><th>Skills</th><td><?php echo $student['skills']; ?></td></tr>
-            <tr><th>Phone</th><td><?php echo $student['phone']; ?></td></tr>
-            <tr><th>Placement Status</th><td><?php echo $student['placement_status']; ?></td></tr>
-        </table>
+        <div class="cards">
+            <div class="card"><h3>Total Jobs Posted</h3><p><?php echo $jobs; ?></p></div>
+            <div class="card"><h3>Applications Received</h3><p><?php echo $applications; ?></p></div>
+        </div>
     </div>
 </div>
 
